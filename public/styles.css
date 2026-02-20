@@ -1,0 +1,254 @@
+/* ── Reset & base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:           #0f0f13;
+  --surface:      #1a1a24;
+  --surface-2:    #23232f;
+  --border:       #2e2e3e;
+  --accent:       #7c6af7;
+  --accent-hover: #9282fa;
+  --danger:       #e25c5c;
+  --danger-hover: #eb7575;
+  --text:         #e2e2ee;
+  --text-muted:   #888899;
+  --bubble-self:  #2e2060;
+  --bubble-other: #1e2030;
+  --radius:       12px;
+  --radius-sm:    8px;
+  --transition:   0.18s ease;
+  --font:         'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+html { height: 100%; }
+
+body {
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 1rem;
+}
+
+/* ── App shell ─────────────────────────────────────────────────────────────── */
+.app {
+  width: 100%;
+  max-width: 680px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+}
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 0 0.25rem;
+}
+
+.logo {
+  width: 48px;
+  height: 48px;
+  flex-shrink: 0;
+  filter: drop-shadow(0 0 8px rgba(124, 106, 247, 0.5));
+}
+
+.app-title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  background: linear-gradient(135deg, #a78bfa, #7c6af7);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.app-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+}
+
+/* ── Status bar ────────────────────────────────────────────────────────────── */
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  min-height: 2.5rem;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.status-bar.waiting  .status-dot { background: #f5a623; box-shadow: 0 0 6px #f5a623; }
+.status-bar.connected .status-dot { background: #4cda64; box-shadow: 0 0 6px #4cda64; }
+.status-bar.limited  .status-dot { background: var(--danger); }
+
+/* ── Chat box ──────────────────────────────────────────────────────────────── */
+.chat-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  min-height: 380px;
+  max-height: 55vh;
+  overflow-y: auto;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  scroll-behavior: smooth;
+}
+
+.chat-placeholder {
+  margin: auto;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  user-select: none;
+}
+
+/* ── Message bubbles ───────────────────────────────────────────────────────── */
+.message {
+  max-width: 72%;
+  padding: 0.55rem 0.9rem;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  word-break: break-word;
+  animation: pop 0.15s ease;
+}
+
+@keyframes pop {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.message.self {
+  align-self: flex-end;
+  background: var(--bubble-self);
+  border-bottom-right-radius: 3px;
+}
+
+.message.other {
+  align-self: flex-start;
+  background: var(--bubble-other);
+  border-bottom-left-radius: 3px;
+}
+
+/* System / event messages */
+.message.system {
+  align-self: center;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-style: italic;
+  padding: 0.2rem 0;
+  max-width: 100%;
+  text-align: center;
+}
+
+/* ── Input area ────────────────────────────────────────────────────────────── */
+.input-area {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-area[aria-hidden="true"] { opacity: 0.4; pointer-events: none; }
+
+.message-input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.92rem;
+  padding: 0.6rem 0.9rem;
+  outline: none;
+  transition: border-color var(--transition);
+}
+
+.message-input:focus { border-color: var(--accent); }
+.message-input::placeholder { color: var(--text-muted); }
+
+/* ── Buttons ───────────────────────────────────────────────────────────────── */
+.btn {
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  transition: background var(--transition), transform 0.1s;
+  white-space: nowrap;
+}
+
+.btn:active { transform: scale(0.96); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+.btn-primary   { background: var(--accent);  color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--accent-hover); }
+
+.btn-secondary { background: var(--surface-2); color: var(--text); border: 1px solid var(--border); }
+.btn-secondary:hover:not(:disabled) { background: var(--border); }
+
+.btn-danger    { background: var(--danger); color: #fff; }
+.btn-danger:hover:not(:disabled) { background: var(--danger-hover); }
+
+.btn-send {
+  background: var(--accent);
+  color: #fff;
+  padding: 0.55rem 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-send svg { width: 20px; height: 20px; }
+.btn-send:hover:not(:disabled) { background: var(--accent-hover); }
+
+.controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+.app-footer {
+  text-align: center;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  margin-top: 0.5rem;
+}
+
+/* ── Utility ───────────────────────────────────────────────────────────────── */
+.hidden { display: none !important; }
+
+/* ── Scrollbar (WebKit) ────────────────────────────────────────────────────── */
+.chat-box::-webkit-scrollbar { width: 6px; }
+.chat-box::-webkit-scrollbar-track { background: transparent; }
+.chat-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 480px) {
+  body { padding: 0.5rem; }
+  .app-title { font-size: 1.6rem; }
+  .message { max-width: 90%; }
+}

@@ -1,124 +1,271 @@
-# ORION - Optimal Random Interactive Online Network
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
+<!--                         ORION  ·  README.md                           -->
+<!-- ═══════════════════════════════════════════════════════════════════════ -->
 
-ORION is a web-based platform that facilitates safe and random anonymous chat connections. Users can connect with random individuals for conversations while maintaining their privacy and ensuring content is clean and appropriate. The platform employs features like message filtering and rate limiting for an optimal user experience.
+<div align="center">
+
+<!-- ── Hero SVG Banner ─────────────────────────────────────────────────── -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 200" width="860" height="200" role="img" aria-label="ORION banner">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#0f0f13"/>
+      <stop offset="100%" stop-color="#1a1a2e"/>
+    </linearGradient>
+    <linearGradient id="txt" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"   stop-color="#a78bfa"/>
+      <stop offset="100%" stop-color="#7c6af7"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="860" height="200" rx="16" fill="url(#bg)"/>
+
+  <!-- Decorative orbit rings -->
+  <g transform="translate(100,100)" fill="none" stroke="#7c6af7" opacity="0.18">
+    <circle cx="0" cy="0" r="72" stroke-width="1.2"/>
+    <circle cx="0" cy="0" r="48" stroke-width="0.8"/>
+    <line x1="-80" y1="0" x2="80" y2="0" stroke-width="0.8"/>
+    <line x1="0" y1="-80" x2="0" y2="80" stroke-width="0.8"/>
+    <line x1="-57" y1="-57" x2="57" y2="57" stroke-width="0.6"/>
+    <line x1="57" y1="-57" x2="-57" y2="57" stroke-width="0.6"/>
+  </g>
+  <!-- Core star -->
+  <g transform="translate(100,100)" filter="url(#glow)">
+    <circle cx="0" cy="0" r="7" fill="#7c6af7"/>
+    <circle cx="0"  cy="-72" r="3" fill="#a78bfa"/>
+    <circle cx="72" cy="0"   r="3" fill="#a78bfa"/>
+    <circle cx="0"  cy="72"  r="3" fill="#a78bfa"/>
+    <circle cx="-72" cy="0" r="3" fill="#a78bfa"/>
+  </g>
+
+  <!-- Title -->
+  <text x="210" y="105" font-family="'Segoe UI',system-ui,sans-serif"
+        font-size="72" font-weight="700" letter-spacing="18"
+        fill="url(#txt)" filter="url(#glow)">ORION</text>
+
+  <!-- Subtitle -->
+  <text x="214" y="140" font-family="'Segoe UI',system-ui,sans-serif"
+        font-size="14" fill="#888899" letter-spacing="2.5">
+    OPTIMAL RANDOM INTERACTIVE ONLINE NETWORK
+  </text>
+
+  <!-- Accent line -->
+  <line x1="210" y1="152" x2="720" y2="152" stroke="#7c6af7" stroke-width="1" opacity="0.4"/>
+</svg>
+
+<!-- ── Badges ──────────────────────────────────────────────────────────── -->
+
+[![Version](https://img.shields.io/badge/version-1.0.0-7c6af7?style=flat-square&logo=git&logoColor=white)](https://github.com/Kaelith69/ORION)
+[![Node.js](https://img.shields.io/badge/Node.js-%3E%3D14-339933?style=flat-square&logo=nodedotjs&logoColor=white)](https://nodejs.org/)
+[![Express](https://img.shields.io/badge/Express-4.x-000000?style=flat-square&logo=express&logoColor=white)](https://expressjs.com/)
+[![Socket.IO](https://img.shields.io/badge/Socket.IO-4.x-010101?style=flat-square&logo=socketdotio&logoColor=white)](https://socket.io/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://opensource.org/licenses/MIT)
+
+</div>
+
+---
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Architecture](#architecture)
+3. [Features](#features)
+4. [Project Structure](#project-structure)
+5. [Installation](#installation)
+6. [Usage](#usage)
+7. [Configuration](#configuration)
+8. [Contributing](#contributing)
+9. [License](#license)
+
+---
+
+## Overview
+
+ORION is a **real-time, anonymous random chat platform** built on Node.js.  
+Two strangers are instantly paired together for a private, ephemeral conversation — no accounts, no history, no trace.
+
+> 🎬 *Imagine a quirky little GIF of two satellites pinging each other here — pure cosmic vibes.*
+
+---
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Browser (Client)                        │
+│                                                                 │
+│   index.html  ◄─── styles.css        client.js                 │
+│                                           │                     │
+│                                    Socket.IO client             │
+└──────────────────────────────────────┬────────────────────────┘
+                                       │  WebSocket / HTTP
+                                       ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                         server.js (Node.js)                     │
+│                                                                 │
+│  ┌───────────┐   ┌──────────────┐   ┌────────────────────────┐ │
+│  │  Express  │   │  Socket.IO   │   │     Chat Engine        │ │
+│  │  (HTTP +  │   │  (real-time  │   │  waitingPool : Set<id> │ │
+│  │  static)  │   │  transport)  │   │  activePairs : Map<id> │ │
+│  └───────────┘   └──────┬───────┘   └────────────────────────┘ │
+│                         │                                       │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │  Middleware: HTTP rate-limit · Message rate-limit          │ │
+│  │             Bad-Words filter · Payload size guard         │ │
+│  └────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Key design decisions
+
+| Concern | Solution |
+|---|---|
+| Partner matching | `waitingPool` (`Set`) + `activePairs` (`Map`) — O(1) operations |
+| Stale-socket safety | Pool is purged of dead sockets before each match attempt |
+| Message abuse | Per-connection sliding-window rate limiter (10 msg / 5 s) |
+| HTTP abuse | `express-rate-limit` (200 req / 15 min) |
+| Content safety | `bad-words` filter; unknown-word errors are caught gracefully |
+| Oversized payloads | `maxHttpBufferSize: 10 KB` on the Socket.IO server |
+| Memory leaks | Full cleanup on every `disconnect` event |
 
 ---
 
 ## Features
 
-- **Anonymous Random Chat:** Connect with random users for a completely anonymous conversation.
-- **Message Filtering:** Employs a bad-words filter to sanitize inappropriate content.
-- **Rate Limiting:** Limits requests to prevent abuse and ensure server stability.
-- **Active Partner Matching:** Automatically matches users looking for a chat partner.
-- **Responsive Design:** Simple, user-friendly interface optimized for various devices.
-
----
-
-## Prerequisites
-
-To run ORION locally, you need:
-
-- [Node.js](https://nodejs.org/) (v14 or later)
-- [npm](https://www.npmjs.com/) or [yarn](https://yarnpkg.com/)
-
----
-
-## Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/sayanth-t-m/orion.git
-   cd orion
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Run the server:
-   ```bash
-   npm start
-   ```
-
-4. Open your browser and navigate to:
-   ```
-   http://localhost:3000
-   ```
+- 🔒 **Fully anonymous** — no sign-up, no stored messages
+- ⚡ **Real-time** — sub-millisecond delivery via WebSocket
+- 🔄 **Skip / Next** — move to the next stranger without leaving the page
+- 🚫 **Profanity filter** — `bad-words` scrubs messages before delivery
+- 🛡️ **Rate limiting** — both HTTP (express) and per-socket (message layer)
+- 💬 **System messages** — in-chat notifications for join / leave / skip events
+- 📱 **Responsive** — fluid layout down to 320 px wide
+- 🎨 **Dark-mode UI** — easy on the eyes at any hour
 
 ---
 
 ## Project Structure
 
-```plaintext
+```
 ORION/
-├── public/           # Static files (HTML, CSS, Client-side JS)
-│   ├── index.html    # Main front-end page
-│   ├── styles.css    # Styling for the UI
-│   └── client.js     # Client-side JavaScript
-├── server.js         # Main server logic (Express and Socket.IO)
-├── package.json      # Node.js dependencies and scripts
-└── README.md         # Project documentation
+├── public/
+│   ├── index.html      # App shell — semantic HTML, accessible markup
+│   ├── styles.css      # CSS custom-properties, dark theme, animations
+│   └── client.js       # Socket.IO client, DOM state machine
+├── server.js           # Express + Socket.IO server, chat engine
+├── package.json        # Dependencies & npm scripts
+├── .gitignore          # Excludes node_modules, .env, build artefacts
+└── README.md           # You are here 🚀
 ```
 
 ---
 
-## How It Works
+## Installation
 
-### 1. **Server-Side Logic:**
-- The server uses **Express** to serve static files and **Socket.IO** to handle real-time communication.
-- Users are added to a waiting pool if no partner is available, or paired with another waiting user.
-- A profanity filter ensures clean communication.
+### Prerequisites
 
-### 2. **Client-Side Logic:**
-- Users can start a chat, send messages, or disconnect from a chat session.
-- The interface updates dynamically based on the server events (e.g., new chat partner, message received).
+- [Node.js](https://nodejs.org/) **v14 or later**
+- npm (bundled with Node.js)
 
-### 3. **Chat Partner Matching:**
-- The system uses a `Set` to track waiting users and a `Map` to store active user pairs.
+### Steps
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/your-username/ORION.git
+cd ORION
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the server
+npm start
+
+# 4. Open in your browser
+#    http://localhost:3000
+```
+
+For a live-reload development workflow:
+
+```bash
+npm run dev   # uses nodemon
+```
 
 ---
 
 ## Usage
 
-1. Open the application in your browser.
-2. Click **Start New Chat** to find a partner.
-3. Once connected, type messages and send them to your partner.
-4. If the partner disconnects, you can search for a new partner.
+| Action | How |
+|---|---|
+| Start chatting | Click **New Chat** |
+| Send a message | Type and press **Enter** or click ▶ |
+| Move to next stranger | Click **Skip** |
+| End the session | Click **Leave** |
+
+### Environment variables
+
+| Variable | Default | Description |
+|---|---|---|
+| `PORT` | `3000` | TCP port the server listens on |
+
+```bash
+PORT=8080 npm start
+```
 
 ---
 
-## Technical Highlights
+## Configuration
 
-- **Express:** For serving static files and handling HTTP requests.
-- **Socket.IO:** Enables real-time communication between clients.
-- **Bad-Words Filter:** Ensures messages remain clean and appropriate.
-- **Rate Limiter:** Prevents spamming and maintains server stability.
+Fine-tune behaviour by editing the constants at the top of `server.js`:
+
+```js
+const PORT                = process.env.PORT || 3000;
+const MAX_MESSAGE_LENGTH  = 500;   // characters per message
+const MESSAGE_RATE_LIMIT  = 10;    // messages per window per user
+const MESSAGE_RATE_WINDOW_MS = 5000; // sliding window (ms)
+```
 
 ---
 
-## Contributions
+## Contributing
 
-Contributions are welcome! Follow these steps:
+Contributions are welcome! Here's the flow:
 
-1. Fork the repository.
-2. Create a new branch:
-   ```bash
-   git checkout -b feature-name
-   ```
-3. Commit your changes:
-   ```bash
-   git commit -m "Add feature-name"
-   ```
-4. Push to the branch:
-   ```bash
-   git push origin feature-name
-   ```
-5. Open a pull request.
+```bash
+# 1. Fork & clone
+git clone https://github.com/<your-handle>/ORION.git
+
+# 2. Create a feature branch
+git checkout -b feat/my-improvement
+
+# 3. Make changes, then commit
+git commit -m "feat: add my improvement"
+
+# 4. Push and open a Pull Request
+git push origin feat/my-improvement
+```
+
+Please follow existing code style (no linter is configured yet — keep it clean).
 
 ---
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+Distributed under the **MIT License**.  
+See [`LICENSE`](https://opensource.org/licenses/MIT) for details.
+
+---
+
+<div align="center">
+
+*Built with ☕ and Socket.IO magic*
+
+---
+
+> **Why do programmers prefer dark mode?**  
+> *Because light attracts bugs.* 🐛
+
+</div>
 
